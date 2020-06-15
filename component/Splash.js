@@ -2,17 +2,16 @@ import React, { useEffect } from 'react'
 import logo from '../processes/image'
 import {Animated, View, Text, StyleSheet, Dimensions, Image, StatusBar} from 'react-native'
 import { LinearGradient } from 'expo-linear-gradient'
-import {_retrieveData} from '../processes/keys'
+import {getKey} from '../processes/keyStore'
+import {loginValue} from '../processes/lock'
 import { useDispatch } from 'react-redux'
 import {login, notLogin} from '../actions/login'
-// import Animated, { Value } from 'react-native-reanimated'
 
 const HEIGHT = Dimensions.get('screen').height
 const WIDTH = Dimensions.get('screen').width
 const Splash = ({ navigation }) => {
     const dispatch = useDispatch()
     const slideDown = React.useRef(new Animated.Value(0)).current
-    console.log(HEIGHT)
     useEffect(() => {
         Animated.timing(slideDown, {
             toValue: 1,
@@ -21,14 +20,12 @@ const Splash = ({ navigation }) => {
         }).start()
     }, [])
     useEffect(() => {
-        const getData = async () => {
-            val = await _retrieveData()
-            if(val) {
+        (async () => {
+            const val = await getKey(loginValue)
+            if(val !== undefined && val !== null){
                 dispatch(login())
-            }else{
-                dispatch(notLogin())
             }
-        }
+        })()
     })
     
     return (

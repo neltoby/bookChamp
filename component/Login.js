@@ -1,31 +1,94 @@
-import React, {useState} from 'react'
+import React, {useState, useEffect} from 'react'
+// import NetInfo from '@react-native-community/netinfo'
+import * as Network from 'expo-network';
+import { LinearGradient } from 'expo-linear-gradient'
 import logo from '../processes/image'
-import { Container, Content, Form, Button } from 'native-base';
+import { Container, Content, Form, Button, Toast, Spinner } from 'native-base';
 import { Input, Icon } from 'react-native-elements';
-import {StatusBar, View, Text, Image, StyleSheet, TouchableOpacity} from 'react-native'
-console.log(logo)
+import {loginRequest} from '../actions/request'
+import {StatusBar, View, Text, Image, StyleSheet, Platform, TouchableOpacity, useWindowDimensions} from 'react-native'
+import { useDispatch, useSelector } from 'react-redux';
+import isJson from '../processes/isJson'
+
 const Login = ({navigation}) => {
+    const windowHeight = useWindowDimensions().height;
     const [username, setUserName] = useState('')
     const [password, setPassword] = useState('')
     const [notVisible, setNotVisible] = useState(true) 
+    const dispatch = useDispatch()
+    const store = isJson(useSelector(state => state))
     const signUp = ()=> {
         navigation.navigate('SignUp')
     }
-    const submit = () => {
-        navigation.navigate('Home', { screen: 'SelectHome' })
+    const submit = async () => {
+        // NetInfo.fetch().then(state => {
+        //     console.log('Connection type ', state.type)
+        //     console.log('Is connected ', state.isConnected)
+        //     // const network = await Network.getNetworkStateAsync();
+        //     // console.log(network)
+        // })
+        try{
+            if(username.trim().length && password.length){
+                const {isConnected, isInternetReachable} = await Network.getNetworkStateAsync();
+                const airplane = await Network.isAirplaneModeEnabledAsync();
+                if(airplane){
+                    Toast.show(
+                        { 
+                            text: `Offline mode`, 
+                            buttonText: 'CLOSE', 
+                        }
+                    )
+                }else{
+                    if(isConnected && isInternetReachable){
+                        let body = {username, password}
+                        dispatch(loginRequest(body))
+                    }
+                }
+            }else{
+                Toast.show(
+                    { 
+                        text: `Username and password required`, 
+                        buttonText: 'CLOSE', 
+                    }
+                )
+            }
+        }catch(error){
+            console.log(error);
+            Toast.show(
+                { 
+                    text: `Network request failed`, 
+                    buttonText: 'CLOSE', 
+                }
+            )
+        }
     }
+    useEffect(() => {
+        if(store.login.login === 'LOGGEDIN'){
+            navigation.navigate('Home')
+        }
+    }, [store.login.login])
+    let toast = store.request.status === 'failed' ? 
+    Toast.show(
+        { 
+            text: store.request.err, 
+            buttonText: 'CLOSE', 
+        }
+    ) : '' 
     return(
-        <Container>
-
-            <Content style={style.content}>
-                <StatusBar backgroundColor="#1258ba" />
+        <Container style={style.content}>
+            <LinearGradient
+                colors={['transparent', '#e1efef']}
+                style={{...style.gradient, height: windowHeight,}}
+            />
+            <Content>               
+                <StatusBar backgroundColor="#054078" />
                 <View style={style.container}>
                     <View style={style.viewImg}>
                         <Image style={style.img} source={logo()}/>
                     </View>
                     <View style={style.divider}>
                         <View style={style.divider1}>
-                            <Text style={{...style.text, fontWeight: 'bold'}}>LOGIN</Text>
+                            <Text style={{...style.text, fontSize: 25, fontWeight: 'bold'}}>LOGIN</Text>
                         </View>
                         <View style={style.divider2}>
                         <TouchableOpacity
@@ -43,6 +106,7 @@ const Login = ({navigation}) => {
                             inputStyle={style.input}
                             inputContainerStyle={style.inputs}
                             label = 'Username'
+                            value={username}
                             labelStyle = {style.label}
                             placeholder="Username"
                             style={style.input}
@@ -61,6 +125,7 @@ const Login = ({navigation}) => {
                             inputStyle={style.input}
                             inputContainerStyle={style.inputs}
                             label = 'Password'
+                            value={password}
                             labelStyle = {style.label}
                             placeholder="Password"
                             style={style.input}
@@ -83,8 +148,11 @@ const Login = ({navigation}) => {
                             }     
                             onChangeText={value => setPassword(value)}
                         /> 
-                            <Button block style={style.but} onPress={submit}>
-                                <Text style={{...style.label, fontWeight: 'bold'}}>LOGIN</Text>
+                            <Button disabled={store.login.status === 'loading' ? true : false} block style={style.but} onPress={() => submit()}>
+                                {store.login.status === 'loading' ?
+                                    <Spinner color='#eee' /> :
+                                    <Text style={{...style.label, fontWeight: 'bold'}}>LOGIN</Text>
+                                }
                             </Button>
                     </Form>
                 </View>
@@ -94,9 +162,14 @@ const Login = ({navigation}) => {
 }
 
 const style = StyleSheet.create({
+    gradient: {
+        position: 'absolute',
+        left: 0,
+        right: 0,
+        top: 0,
+    },
     content: {
-        flex: 1,
-        backgroundColor: '#3480eb',
+        backgroundColor: '#054078',
     },
     container: {
         alignItems: 'center',
@@ -136,7 +209,7 @@ const style = StyleSheet.create({
         borderColor: '#fff',
     },
     text: {
-        fontSize: 18,
+        fontSize: 23,
         fontWeight: '500',
         color: '#fff',
     },

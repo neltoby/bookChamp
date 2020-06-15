@@ -11,7 +11,13 @@ import LearnScreen from './LearnScreen'
 import QuizScreen from './QuizScreen'
 import ArchiveScreen from './ArchiveScreen'
 import RankingScreen from './RankingScreen'
+import ReadPost from './ReadPost'
+import ViewArchive from './ViewArchive'
+import SearchArchive from './SearchArchive'
 import PlayQuizScreen from './PlayQuizScreen'
+import ReviewQuestion from './ReviewQuestion'
+import Subject from './Subject'
+import TransSummary from './TransSummary'
 import { createDrawerNavigator } from '@react-navigation/drawer';
 
 const Drawer = createDrawerNavigator();
@@ -32,7 +38,14 @@ const Home = () => {
             <Drawer.Screen name="Archive" component={ArchiveScreen} />
             <Drawer.Screen name="Ranking" component={RankingScreen} />
             <Drawer.Screen name="PlayQuiz" component={PlayQuizScreen} />
+            <Drawer.Screen name="Subject" component={Subject} />
+            <Drawer.Screen name="ReadPost" component={ReadPost} />
+            <Drawer.Screen name="TransSummary" component={TransSummary} />
+            <Drawer.Screen name="SearchArchive" component={SearchArchive} />
+            <Drawer.Screen name="ViewArchive" component={ViewArchive} />
+            <Drawer.Screen name="ReviewQuestion" component={ReviewQuestion} />
         </Drawer.Navigator>
     )
 }
+ReadPost
 export default Home

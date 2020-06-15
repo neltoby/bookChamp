@@ -1,26 +1,44 @@
 import React, {useState, useEffect, useRef} from 'react'
+import { LinearGradient } from 'expo-linear-gradient'
+import * as ImagePicker from 'expo-image-picker';
+import Constants from 'expo-constants';
 import logo from '../processes/image'
-import {View, Text, StyleSheet, StatusBar, Image, Animated} from 'react-native'
+import {View, Text, StyleSheet, StatusBar, Image, Animated, useWindowDimensions, Platform} from 'react-native'
 import { Input, Button, Icon, Overlay } from 'react-native-elements';
-import { Container, Header, Content, Left, Right, Body, Title } from 'native-base';
+import { Container, Header, Content, Left, Right, Body, Title, Icon as NativeIcon, Button as NButton } from 'native-base';
 
 const Username = ({ navigation, route }) => {
+    const windowHeight = useWindowDimensions().height;
     const iconValue = useRef(new Animated.Value(24)).current
     const [visible, setVisible] = useState(false)
+    const [imgUrl, setImg] = useState({})
     const [username, setUserName] = useState('')
     const [name, setName] = useState('')
     const [email, setEmail] = useState('')
     const [phone, setPhone] = useState('')
     const [password, setPassword] = useState('')
+    const pickImage = async () => {
+        let result = await ImagePicker.launchImageLibraryAsync({
+            mediaTypes: ImagePicker.MediaTypeOptions.Images,
+            allowsEditing: true,
+            aspect: [4, 3],
+            quality: 1,
+        });
+      
+        console.log(result);
+      
+          if (!result.cancelled) {
+            setImg(result);
+          }
+    }
     const handleBack = () => {
-        // validation first
         navigation.navigate('SignUp', {
             name, email, phone, password
         })
     }
     const nextSlide = () => {        
-    navigation.navigate('Welcome')
-    setVisible(false)
+        navigation.navigate('Welcome')
+        setVisible(false)
     }
     const handleSignUp = () => {
         setVisible(true)
@@ -44,20 +62,29 @@ const Username = ({ navigation, route }) => {
             setPassword(route.params?.password)
         }
     },[route.params])
-    console.log(route.params, 'on line 32 username')
+    useEffect(() => {
+        (async () => {
+            if (Constants.platform.ios) {
+                const { status } = await ImagePicker.requestCameraRollPermissionsAsync();
+                if (status !== 'granted') {
+                alert('Sorry, we need camera roll permissions to make this work!');
+                }
+            }
+        })();
+      }, []);
     return(
-        <Container>
-            <Header style={{backgroundColor: '#3480eb'}}>
+        <Container style={{backgroundColor: '#054078'}}>
+            <LinearGradient
+                colors={['transparent', '#e1efef']}
+                style={{...style.gradient, height: windowHeight,}}
+            />
+            <Header transparent >
                 <Left>
-                    <Icon
-                        type='font-awesome'
-                        name='angle-left'
-                        size={24}
-                        color='#fff'
-                        onPress = {handleBack}
-                    />                
+                    <NButton transparent onPress = {handleBack}>
+                        <NativeIcon name={Platform.OS == 'ios' ? 'chevron-back' : 'arrow-back'} />
+                    </NButton>
                 </Left>
-                <Body style={{alignItems: 'center'}}>
+                <Body>
                     <Title>Book Champ</Title>
                 </Body>
                 <Right>
@@ -65,33 +92,46 @@ const Username = ({ navigation, route }) => {
                     style={style.img} />
                 </Right>
             </Header>
-            <Content padder style={style.container}>
-                <StatusBar backgroundColor="#1258ba" />
-                <View style={{...style.viewImg, marginTop: 70, marginBottom: 30}}>
-                    <Text style={style.usertext}>Create a username</Text>    
+            <Content 
+                contentContainerStyle={{flex: 1, alignItems: 'center', justifyContent: 'center'}} 
+                style={style.container}
+            >
+                <StatusBar backgroundColor="#054078" />
+                <View style={{...style.viewImg, marginBottom: 30}}>
+                    <Image 
+                        source={Object.entries(imgUrl).length ? { uri: imgUrl.uri } : require('../img/anonymous.jpg') } 
+                        style={style.imgUrl} 
+                    />
+                    <View style={style.upload}>
+                        <NButton small onPress={pickImage} style={{paddingHorizontal: 5, backgroundColor: '#054078'}}>
+                            <Text style={{color: '#fff', fontWeight: 'bold'}}>UPLOAD A PICTURE</Text>
+                        </NButton>
+                    </View>
                 </View>
+                <View style={style.inputContainer}>
                 <Input
                     value = {username}
                     label = 'Username'
                     labelStyle = {style.label}
+                    inputContainerStyle={style.inputs}
+                    inputStyle={style.input}
                     placeholder='Username'
                     leftIcon={
                         <Icon
                         type='font-awesome'
                         name='user-circle'
                         size={24}
-                        color='#3480eb'
+                        color='#fff'
                         />
                     }
-                    errorStyle={{ color: 'red' }}
-                    errorMessage=''
                     onChangeText={value => setUserName(value)}
                 />
+                </View>
                 <View style={{...style.viewImg, marginTop: 20}}>
                     <Button
                         onPress = {handleSignUp}
                         raised
-                        buttonStyle = {{width: 150}}
+                        buttonStyle = {{width: 150, backgroundColor: '#1258ba'}}
                         type = 'solid'
                         icon={
                             <Icon
@@ -119,7 +159,7 @@ const Username = ({ navigation, route }) => {
                         <Button
                             onPress = {nextSlide}
                             raised
-                            buttonStyle = {{width: 150}}
+                            buttonStyle = {{width: 150, backgroundColor: '#1258ba'}}
                             type = 'solid'
                             icon={
                                 <Icon
@@ -142,16 +182,29 @@ const Username = ({ navigation, route }) => {
 export default Username
 
 const style = StyleSheet.create({
+    gradient: {
+        position: 'absolute',
+        left: 0,
+        right: 0,
+        top: 0,
+    },
     container: {
-        flex: 1,
+        // flex: 1,
     },
     label: {
-        color: '#3480eb'
+        color: '#fff'
     },
     img: {
         width: 40,
         height: 40,
         borderRadius: 4,
+    },
+    imgUrl: {
+        width: 120,
+        height: 120,
+    },
+    upload: {
+        marginTop: 20,
     },
     viewImg: {
         margin: 10,
@@ -159,7 +212,16 @@ const style = StyleSheet.create({
     },
     usertext: {
         fontSize: 22,
-        color: '#3480eb'
+        color: '#fff'
+    },
+    inputContainer: {
+        width: '80%'
+    },
+    input: {
+        color: '#fff',
+    },
+    inputs: {
+        borderColor: '#fff',
     },
     modalView: {
         padding: 20,

@@ -1,15 +1,26 @@
 import React from 'react'
+import { LinearGradient } from 'expo-linear-gradient'
 import {
     DrawerContentScrollView, DrawerItem,
   } from '@react-navigation/drawer';
 // import { SafeAreaView } from 'react-native-safe-area-context';
 import { Icon, Badge } from 'react-native-elements';
 import { useNavigation } from '@react-navigation/native';
+import {deleteKey} from '../processes/keyStore'
+import {notLogin} from '../actions/login'
+import {loginValue} from '../processes/lock'
 import { SafeAreaView, View, Text, Image, StyleSheet,  } from 'react-native'
+import { useDispatch } from 'react-redux';
 
 const CustomSideBar = (props) => {
-    const [Logout, setLogout] = React.useState(false)
     const {navigation} = props
+    const dispatch = useDispatch()
+    const setLogout = async () => {
+        await deleteKey(loginValue)
+        dispatch(notLogin())
+        navigation.navigate('Login')
+    }
+    
     let firstData = [
         {
             text: 'Quiz', 
@@ -64,6 +75,10 @@ const CustomSideBar = (props) => {
         <DrawerContentScrollView>
             <SafeAreaView style={style.container}>
                 <View style={style.imgContainer}>
+                <LinearGradient
+                    colors={['transparent', '#e1efef']}
+                    style={{...style.gradient, height: 150,}}
+                />
                     <View style={style.imgView}>
                         <Image source={require('../img/user.jpg')} style={style.img} />
                     </View>
@@ -112,9 +127,15 @@ const style = StyleSheet.create({
     },
     imgContainer: {
         height: 150,
-        backgroundColor: '#3480eb',
+        backgroundColor: '#054078',
         flexDirection: 'row',
         justifyContent: 'center'
+    },
+    gradient: {
+        position: 'absolute',
+        left: 0,
+        right: 0,
+        top: 0,
     },
     imgView: {
         width: '50%',

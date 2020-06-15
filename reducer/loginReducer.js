@@ -1,11 +1,12 @@
 import produce from 'immer'
-import {LOGGEDIN, NOTLOGGEDIN} from '../actions/login'
+import {LOGGEDIN, NOTLOGGEDIN, LOGIN_STATUS} from '../actions/login'
 
 const initialState = {
     login: '',
+    status: 'inactive',
 }
 
-export default function homeReducer(state = initialState, action) {
+export default function loginReducer(state = initialState, action) {
     switch (action.type){
         case LOGGEDIN: {
             return produce(state, draft => {
@@ -15,6 +16,11 @@ export default function homeReducer(state = initialState, action) {
         case NOTLOGGEDIN: {
             return produce(state, draft => {
 			    draft.login = action.type ;			    
+			})
+        }
+        case LOGIN_STATUS: {
+            return produce(state, draft => {
+			    draft.status =  action.payload  		    
 			})
         }
         default:{

@@ -1,10 +1,12 @@
 import React from 'react'
+import { LinearGradient } from 'expo-linear-gradient'
 import { useFocusEffect } from '@react-navigation/native';
 import { Button } from 'react-native-elements';
-import { View, Text, Image, StyleSheet, StatusBar } from 'react-native'
+import { View, Text, Image, StyleSheet, StatusBar, useWindowDimensions } from 'react-native'
 import { TouchableHighlight } from 'react-native-gesture-handler';
 
 const QuizScreen = ({ navigation }) => {
+    const windowHeight = useWindowDimensions().height;
     const data = [
         {no: 1, text: 'Every correct answer attracts 3 marks'},
         {no: 2, text: 'Every wrong answer attracts -0.1'},
@@ -27,6 +29,10 @@ const QuizScreen = ({ navigation }) => {
                 <Image source={require('../img/quizStar.jpg')} style={style.foreImg} />
             </View>
             <View style={style.secContainer}>
+                <LinearGradient
+                    colors={['transparent', '#e1efef']}
+                    style={{...style.gradient, height: windowHeight,}}
+                />
                 <View style={style.viewImg}> 
                     <Image source={require('../img/book-champ.png')} style={style.img} />
                 </View>
@@ -58,11 +64,17 @@ const style = StyleSheet.create({
     container: {
         flex: 1,
     },
+    gradient: {
+        position: 'absolute',
+        left: 0,
+        right: 0,
+        top: 0,
+    },
     secContainer: {
         flex: 0.7,
         justifyContent: 'flex-start',
         alignItems: 'center',
-        backgroundColor: '#3480eb'
+        backgroundColor: '#054078'
     },
     fore: {
         flex: 0.3,

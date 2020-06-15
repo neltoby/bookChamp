@@ -7,9 +7,9 @@ const SelectHome  = ({ navigation }) => {
     const windowHeight = useWindowDimensions().height;
     return(
         <View style={style.container}>
-            <StatusBar barStyle="light-content" backgroundColor="#3480eb" />
+            <StatusBar barStyle="light-content" backgroundColor="#054078" />
             <LinearGradient
-                colors={['transparent', '#34cdeb']}
+                colors={['transparent', '#e1efef']}
                 style={{...style.gradient, height: windowHeight,}}
             />
             <View style={style.quiz}>
@@ -34,7 +34,7 @@ const SelectHome  = ({ navigation }) => {
 const style = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#3480eb',
+        backgroundColor: '#054078',
     },
     quiz: {
         height: '50%',

@@ -1,4 +1,5 @@
 import React from 'react'
+import { LinearGradient } from 'expo-linear-gradient'
 import logo from '../processes/image'
 import { Button, Icon } from 'react-native-elements';
 import { Container, Content, H1 } from 'native-base';
@@ -13,7 +14,10 @@ const Welcome = ({ navigation }) => {
             <Content style={style.container}>
                 <View style={style.container}>
                     <View style={style.background}>
-
+                    <LinearGradient
+                        colors={['#e1efef', 'transparent']}
+                        style={{...style.gradient, height: 200,}}
+                    />
                     </View>
                     <View style={style.contentImage}>
                         <Image source={logo()} style={style.img} />                       
@@ -52,13 +56,19 @@ const Welcome = ({ navigation }) => {
 }
 
 const style = StyleSheet.create({
+    gradient: {
+        position: 'absolute',
+        left: 0,
+        right: 0,
+        top: 0,
+    },
     container: {
         flex: 1,
         backgroundColor: '#fff',
     },
     background: {
         height: 200,
-        backgroundColor: '#3480eb'
+        backgroundColor: '#054078'
     },
     contentImage: {
         alignItems: 'center',
@@ -99,7 +109,7 @@ const style = StyleSheet.create({
     continue: {
         width: '70%',
         alignSelf: 'center',
-        // backgroundColor: '#39e600',
+        backgroundColor: '#1258ba',
         marginTop: 50,
     }
 })
