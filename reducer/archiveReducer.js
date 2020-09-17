@@ -22,7 +22,7 @@ export default function archiveReducer (state=initialState, action) {
                     }
                 });
                 if(!val){
-                    action.payload.item.archive = true
+                    action.payload.item.archived = true
                     draft.archive.push(action.payload)
                 }
             })
@@ -42,7 +42,7 @@ export default function archiveReducer (state=initialState, action) {
                 let textArr = action.payload.trim().split(' ')
                 let newArchive = state.archive.filter((element, i) => {
                     element = isJson(element)
-                    console.log(element, 'line 45 archive reducer')
+                    // console.log(element, 'line 45 archive reducer')
                     if (textArr.some(arr => element.item.text.includes(arr))) return element
                 })
                 draft.searchRes = newArchive

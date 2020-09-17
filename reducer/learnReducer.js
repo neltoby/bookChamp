@@ -1,10 +1,13 @@
 import produce from 'immer'
 import {displayItems} from '../processes/displayItems'
-import {LIKE, ARCHIVE, UNARCHIVE} from '../actions/learn'
+import {LIKE, ARCHIVE, UNARCHIVE, SETARTICLE, LOADING_ARTICLE, 
+    ARTICLE_REMOVE_ERR, LOADING_ARTICLE_STOP, ARTICLE_LOADING_FAILED} from '../actions/learn'
 import isJson from '../processes/isJson'
 
 const initialState = {
-    displayItems: isJson(displayItems)
+    displayItems: [],
+    loading_article: false,
+    load_error: false,
 }
 
 export default function learnReducer (state = initialState, action) {
@@ -15,12 +18,12 @@ export default function learnReducer (state = initialState, action) {
                 let newItemRes = newItem.map((item, i) => {
                     item=isJson(item)
                     if(item.id == action.payload){
-                        if(item.like === true){
+                        if(item.liked === true){
                             item.likeCount = item.likeCount - 1
-                            item.like = false 
+                            item.liked = false 
                         }else{
                             item.likeCount = item.likeCount + 1
-                            item.like = true
+                            item.liked = true
                         }          
                     }
                     return item
@@ -34,8 +37,8 @@ export default function learnReducer (state = initialState, action) {
                 let newItemRes = newItem.map((item, i) => {
                     item = isJson(item)
                     if(item.id == action.payload.item.id){
-                        if(item.archive === false){
-                            item.archive = true
+                        if(item.archived === false){
+                            item.archived = true
                         }         
                     }
                     return item
@@ -49,12 +52,37 @@ export default function learnReducer (state = initialState, action) {
                 draft.displayItems = newDisplay.map((element, i) => {
                     element=isJson(element)
                     if(element.id == action.payload){
-                        element.archive = false
+                        element.archived = false
                     }
                     return element
                 })
             })
         }
+        case SETARTICLE: {
+            return produce(state, draft => {
+                draft.displayItems = action.payload
+            })
+        }
+        case LOADING_ARTICLE: {
+            return produce(state, draft => {
+                draft.loading_article = true
+            })
+        }
+        case LOADING_ARTICLE_STOP: {
+            return produce(state, draft => {
+                draft.loading_article = false
+            })
+        }
+        case ARTICLE_LOADING_FAILED: {
+            return produce(state, draft => {
+                draft.load_error = true
+            })
+        }
+         case ARTICLE_REMOVE_ERR: {
+             return produce(state, draft => {
+                 draft.load_error = false
+             })
+         }
         default: {
             return state
         }

@@ -3,7 +3,7 @@ import {questions} from '../processes/questions'
 import isJson from '../processes/isJson'
 import {CORRECT, WRONG, DISPLAYED, PLAYED, NEXT, INCREASE_SCORE, DECREASE_SCORE, 
     SKIP, ACTIVE, TIME_OUT, PLAY_AGAIN, ANSWER, CORRECT_ANS, SET_TIME, 
-    PLAYED_CURRENT, RESET_PLAYED_CURRENT} from '../actions/quiz'
+    PLAYED_CURRENT, RESET_PLAYED_CURRENT, SET_OVERLAY} from '../actions/quiz'
 
 
 const initialState = {
@@ -19,6 +19,7 @@ const initialState = {
     setTime: '',
     status: 'active',
     times: 0,
+    setOverlay: 'cancel',
     playedCurrent: 0,
     answer: false,
     correctAns: false,
@@ -37,6 +38,7 @@ export default function quizReducer (state = initialState, action) {
                 draft.skipped = []
                 draft.status = 'active'
                 draft.times = state.times + 1
+                draft.setOverlay = 'cancel'
                 draft.answer = false
                 draft.correctAns = false
                 draft.setTime = (Date.now() / 1000) + 32,
@@ -46,6 +48,18 @@ export default function quizReducer (state = initialState, action) {
         case RESET_PLAYED_CURRENT: {
             return produce(state, draft => {
                 draft.playedCurrent = action.payload
+            })
+        }
+        case SET_OVERLAY: {
+            return produce(state, draft => {
+                console.log('from quizReducer')
+                if(state.setOverlay === 'end' && action.payload === 'timeOut'){
+                    draft.setOverlay = 'end'                
+                }else if(state.setOverlay === 'timeOut' && action.payload === 'end'){
+                    draft.setOverlay = 'timeOut'
+                }else{
+                    draft.setOverlay = action.payload                
+                }
             })
         }
         case PLAYED_CURRENT: {
@@ -95,7 +109,13 @@ export default function quizReducer (state = initialState, action) {
         }
         case DISPLAYED: {
             return produce(state, draft => {
-                draft.displayed.push(action.payload)
+                if(action.paylaod == 0){
+                    console.log(action.payload, 'payload from displayed reducer')
+                    draft.displayed.push(0)
+                }else {
+                    console.log(action.payload, 'payload from displayed reducer with a numb4er')
+                    draft.displayed.push(action.payload)
+                }
             })
         }
         case NEXT: {
@@ -116,6 +136,7 @@ export default function quizReducer (state = initialState, action) {
         case TIME_OUT: {
             return produce(state, draft => {
                 draft.status = 'time_out'
+                draft.setTime = ''
             })
         }
         default: {

@@ -9,3 +9,8 @@ export const category = [
     {text: 'Lifestyle', num: 10, col: 'green'},
     {text: 'Geography', num: 10, col: '#e85f29'},
 ]
+
+export const capitalize = (str) => {
+    if(typeof str !== 'string') return ''
+    return str.charAt(0).toUpperCase() + str.slice(1)
+}

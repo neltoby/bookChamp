@@ -3,15 +3,20 @@ import React, {useState, useEffect} from 'react'
 import * as Network from 'expo-network';
 import { LinearGradient } from 'expo-linear-gradient'
 import logo from '../processes/image'
+import Overlay from './Overlay';
+import { useFocusEffect } from '@react-navigation/native';
+// import { realDeviceHeight } from '../processes/deviceSize'
 import { Container, Content, Form, Button, Toast, Spinner } from 'native-base';
 import { Input, Icon } from 'react-native-elements';
 import {loginRequest} from '../actions/request'
+import Rolling from './Rolling'
 import {StatusBar, View, Text, Image, StyleSheet, Platform, TouchableOpacity, useWindowDimensions} from 'react-native'
 import { useDispatch, useSelector } from 'react-redux';
-import isJson from '../processes/isJson'
+import isJson from '../processes/isJson';
 
 const Login = ({navigation}) => {
     const windowHeight = useWindowDimensions().height;
+    const deviceWidth = useWindowDimensions().width;
     const [username, setUserName] = useState('')
     const [password, setPassword] = useState('')
     const [notVisible, setNotVisible] = useState(true) 
@@ -30,6 +35,8 @@ const Login = ({navigation}) => {
         try{
             if(username.trim().length && password.length){
                 const {isConnected, isInternetReachable} = await Network.getNetworkStateAsync();
+                console.log(isConnected)
+                console.log(isInternetReachable)
                 const airplane = await Network.isAirplaneModeEnabledAsync();
                 if(airplane){
                     Toast.show(
@@ -53,7 +60,7 @@ const Login = ({navigation}) => {
                 )
             }
         }catch(error){
-            console.log(error);
+            console.log(error.message);
             Toast.show(
                 { 
                     text: `Network request failed`, 
@@ -62,11 +69,13 @@ const Login = ({navigation}) => {
             )
         }
     }
-    useEffect(() => {
-        if(store.login.login === 'LOGGEDIN'){
-            navigation.navigate('Home')
-        }
-    }, [store.login.login])
+    useFocusEffect(
+        React.useCallback(() => {
+            if(store.login.login === 'LOGGEDIN'){
+                navigation.navigate('Home')
+            }
+        }, [store.login.login])
+    )
     let toast = store.request.status === 'failed' ? 
     Toast.show(
         { 
@@ -156,7 +165,11 @@ const Login = ({navigation}) => {
                             </Button>
                     </Form>
                 </View>
+                <Overlay isVisible={store.login.status === 'loading' ? true : false} >
+                    <Rolling text='Logging In...' />
+                </Overlay>
             </Content>
+
         </Container>
     )
 }

@@ -1,4 +1,5 @@
 import React, {useState} from 'react'
+import { useFocusEffect } from '@react-navigation/native';
 import { LinearGradient } from 'expo-linear-gradient'
 import { View, FlatList, StyleSheet, Text, useWindowDimensions } from 'react-native'
 import {Button, Icon} from 'native-base'
@@ -10,6 +11,12 @@ const Basic = (props) => {
     const {dataContent, navigation} = props
     const [selected, setSelected] = useState(false)
     const [itemSelect, setItem] = useState({})
+    useFocusEffect(
+        React.useCallback(() => {               
+          return () =>
+            undoSelect()
+        }, [])
+    );
     const undoSelect = () => {
         setItem({})
         setSelected(false)

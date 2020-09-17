@@ -1,11 +1,17 @@
 import React from 'react'
 import { LinearGradient } from 'expo-linear-gradient'
 import { useFocusEffect } from '@react-navigation/native';
+import deviceSize from '../processes/deviceSize'
 import { Container, Header, Content, Footer, Left, Body, Title, Subtitle, Right, Button, Icon as NativeIcon } from 'native-base'
 import { View, FlatList, Text, StyleSheet, StatusBar, useWindowDimensions, TouchableHighlight } from 'react-native'
+import { useDispatch } from 'react-redux';
+import { loadingArticle, articleErrRem } from '../actions/learn'
+
+// const windowHeight = deviceSize().deviceHeight
 
 const LearnScreen = ({ navigation }) => {
-    const windowHeight = useWindowDimensions().height;
+    const windowHeight = deviceSize().deviceHeight
+    const dispatch = useDispatch()
     useFocusEffect(
         React.useCallback(() => {
             StatusBar.setBarStyle('light-content');
@@ -27,6 +33,13 @@ const LearnScreen = ({ navigation }) => {
     ]
 
     const selectSubject = (subject) => {
+        // unset/remove the error display page
+        dispatch(articleErrRem())
+
+        // set the activityindicator rolling
+        dispatch(loadingArticle())
+
+        // navigate to the selected page
         navigation.navigate('Subject', {subject: subject})
     }
 

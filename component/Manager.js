@@ -18,13 +18,19 @@ const Manager = () => {
     return(
         <SafeAreaProvider>
             <NavigationContainer>
-                <Stack.Navigator initialRouteName={store.login.login === LOGGEDIN ? 'Home' : 'Login'}>
-                    <Stack.Screen name="Username" component={Username} options={{headerShown: false}} />
-                    <Stack.Screen name="SignUp" component={SignUp} options={{headerShown: false}} />
-                    <Stack.Screen name="Login" component={Login} options={{headerShown: false}} />
-                    <Stack.Screen name="Home" component={Home}  options={{headerShown: false}} />
-                    <Stack.Screen name="Welcome" component={Welcome} options={{headerShown: false}} />
-                </Stack.Navigator>
+                {store.login.login !== LOGGEDIN ? (
+                        <Stack.Navigator initialRouteName='Login'>
+                            <Stack.Screen name="Username" component={Username} options={{headerShown: false}} />
+                            <Stack.Screen name="SignUp" component={SignUp} options={{headerShown: false}} />
+                            <Stack.Screen name="Login" component={Login} options={{headerShown: false}} />                           
+                        </Stack.Navigator>                   
+                ): (
+                    <Stack.Navigator initialRouteName='Home'>
+                        <Stack.Screen name="Home" component={Home}  options={{headerShown: false}} />
+                        <Stack.Screen name="Welcome" component={Welcome} options={{headerShown: false}} />
+                    </Stack.Navigator>
+                )}
+                
             </NavigationContainer>
         </SafeAreaProvider>
     )

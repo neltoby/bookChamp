@@ -8,6 +8,7 @@ export const ACTIVE = 'ACTIVE'
 export const TIME_OUT = 'TIME_OUT'
 export const SKIP = 'SKIP'
 export const PLAYED = 'PLAYED'
+export const SET_OVERLAY = 'SET_OVERLAY'
 export const PLAY_AGAIN = 'PLAY_AGAIN'
 export const ANSWER = 'ANSWER'
 export const CORRECT_ANS = 'CORRECT_ANS'
@@ -19,6 +20,14 @@ export const answered = payload => {
     return {
         type: ANSWER,
         payload: payload
+    }
+}
+
+export const setOverlay = payload => {
+    console.log('setOlays called')
+    return {
+        type: SET_OVERLAY,
+        payload,
     }
 }
 export const resetplayedCurrent = payload => {
@@ -78,6 +87,7 @@ export const wrongAnswers = payload => {
     }
 }
 export const displayedQuestion = payload => {
+    console.log(payload, 'and this was called from the other page of the quia action')
     return {
         type: DISPLAYED,
         payload: payload

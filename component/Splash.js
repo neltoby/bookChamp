@@ -22,6 +22,7 @@ const Splash = ({ navigation }) => {
     useEffect(() => {
         (async () => {
             const val = await getKey(loginValue)
+            console.log(val)
             if(val !== undefined && val !== null){
                 dispatch(login())
             }

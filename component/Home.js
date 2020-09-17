@@ -14,7 +14,7 @@ import RankingScreen from './RankingScreen'
 import ReadPost from './ReadPost'
 import ViewArchive from './ViewArchive'
 import SearchArchive from './SearchArchive'
-import PlayQuizScreen from './PlayQuizScreen'
+import { MemoizedPlayQuizScreen } from './PlayQuizScreen'
 import ReviewQuestion from './ReviewQuestion'
 import Subject from './Subject'
 import TransSummary from './TransSummary'
@@ -23,6 +23,7 @@ import { createDrawerNavigator } from '@react-navigation/drawer';
 const Drawer = createDrawerNavigator();
 
 const Home = () => {
+    
     return (
         <Drawer.Navigator hideStatusBar 
         initialRouteName="SelectHome" 
@@ -37,7 +38,7 @@ const Home = () => {
             <Drawer.Screen name="Setting" component={SettingScreen} />
             <Drawer.Screen name="Archive" component={ArchiveScreen} />
             <Drawer.Screen name="Ranking" component={RankingScreen} />
-            <Drawer.Screen name="PlayQuiz" component={PlayQuizScreen} />
+            <Drawer.Screen name="PlayQuiz" component={MemoizedPlayQuizScreen} />
             <Drawer.Screen name="Subject" component={Subject} />
             <Drawer.Screen name="ReadPost" component={ReadPost} />
             <Drawer.Screen name="TransSummary" component={TransSummary} />

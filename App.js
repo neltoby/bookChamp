@@ -17,7 +17,7 @@ const App = () => {
   const [isReady, setIsReady] = React.useState(false)
   useEffect(() => {
     async function fetchFont() {
-    await Font.loadAsync({
+      await Font.loadAsync({
         Roboto: require('native-base/Fonts/Roboto.ttf'),
         Roboto_medium: require('native-base/Fonts/Roboto_medium.ttf'),
         ...Ionicons.font,
@@ -25,10 +25,9 @@ const App = () => {
       
     }
     fetchFont().then(() => {
-      setTimeout(() => {
+      // setTimeout(() => {
         setIsReady(true)
-      }, 2000);
-      
+      // }, 1000);      
     })
   }, [])
   return( 

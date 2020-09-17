@@ -10,12 +10,12 @@ export default function loginReducer(state = initialState, action) {
     switch (action.type){
         case LOGGEDIN: {
             return produce(state, draft => {
-			    draft.login = action.type ;			    
+			    draft.login = action.payload ;			    
 			})
         }
         case NOTLOGGEDIN: {
             return produce(state, draft => {
-			    draft.login = action.type ;			    
+			    draft.login = action.payload ;			    
 			})
         }
         case LOGIN_STATUS: {

@@ -1,6 +1,6 @@
 import {useState, useEffect} from 'react'
 import { useDispatch } from 'react-redux'
-import {timeOut} from '../actions/quiz'
+import {timeOut, setOverlay} from '../actions/quiz'
 
 const useTime = (tenmin) => {
     const dispatch = useDispatch()
@@ -16,6 +16,7 @@ const useTime = (tenmin) => {
                 setReturned(leftTime)
             }else{
                 dispatch(timeOut())
+                dispatch(setOverlay('timeOut'))
                 setReturned('')
             }
         }else{
@@ -24,7 +25,7 @@ const useTime = (tenmin) => {
     }
     useEffect(() => {       
         let clear = setInterval(() => {
-            if(tenmin){
+            if(tenmin !== null && tenmin !== undefined && tenmin !== ''){
                 remainingTime() 
             }
         }, 1000);
@@ -33,7 +34,7 @@ const useTime = (tenmin) => {
             clearInterval(clear)
         }
        
-    } )
+    },[tenmin] )
     return returned
 }
 
