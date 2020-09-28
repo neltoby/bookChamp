@@ -1,10 +1,10 @@
 import React, {useState, useEffect} from 'react'
-import { LinearGradient } from 'expo-linear-gradient'
 import logo from '../processes/image'
 import SimpleReactValidator from 'simple-react-validator';
-import { Container, Header, Content, Left, Right, Body, Title, Toast, Button as NButton } from 'native-base';
-import {View, Text, StyleSheet, StatusBar, Image, useWindowDimensions} from 'react-native'
-import { Input, Avatar, Divider, Button, Icon } from 'react-native-elements';
+import Container from './Container'
+import { Content, Toast, Button as NButton } from 'native-base';
+import {View, Text, StyleSheet, StatusBar, Image } from 'react-native'
+import { Input, Icon } from 'react-native-elements';
 
 const SignUp = ({ navigation, route }) => {
     const [notVisible, setNotVisible] = useState(true) 
@@ -12,9 +12,7 @@ const SignUp = ({ navigation, route }) => {
     const [email, setEmail] = useState('')
     const [phone, setPhone] = useState('')
     const [password, setPassword] = useState('')
-    // let clear
     const validator = new SimpleReactValidator();
-    const windowHeight = useWindowDimensions().height;
     handleSignUp = () => {
         if (validator.allValid()) {
             if(name.trim().split(' ').length > 1){
@@ -76,13 +74,8 @@ const SignUp = ({ navigation, route }) => {
         return () => {
         }
     },[route.params])
-    return(
-        
-            <Container style={{backgroundColor: '#054078'}}>
-                <LinearGradient
-                    colors={['transparent', '#e1efef']}
-                    style={{...style.gradient, height: windowHeight,}}
-                />               
+    return(       
+            <Container style={{backgroundColor: '#054078'}}>              
                 <Content contentContainerStyle={{alignItems: 'center'}} style={style.container}>
                 <StatusBar backgroundColor="#054078" />
                 <View style={{...style.viewImg, marginBottom: 20}}>
@@ -126,6 +119,7 @@ const SignUp = ({ navigation, route }) => {
                     label = 'Email'
                     labelStyle = {style.label}
                     placeholder="Email"
+                    keyboardType="email-address"
                     inputContainerStyle={style.inputs}
                     inputStyle={style.input}
                     leftIcon={
@@ -142,6 +136,7 @@ const SignUp = ({ navigation, route }) => {
                     label = 'Phone Number'
                     labelStyle = {style.label}
                     placeholder="Phone Number"
+                    keyboardType="numeric"
                     inputContainerStyle={style.inputs}
                     inputStyle={style.input}
                     leftIcon={

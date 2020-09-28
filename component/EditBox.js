@@ -143,7 +143,6 @@ export default function EditBox(props) {
                         dateInput: {
                             marginLeft: 36
                         }
-                        // ... You can check the source to find the other keys.
                         }}
                         onDateChange={(date) => setVal(date)}
                     />

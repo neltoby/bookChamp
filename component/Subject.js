@@ -1,16 +1,17 @@
-import React, { useState, lazy, Suspense } from 'react'
-import { useFocusEffect } from '@react-navigation/native';
-import { SearchBar } from 'react-native-elements';
+import React, { useEffect, lazy, Suspense, useMemo } from 'react'
 import FocusAwareStatusBar from './FocusAwareStatusBar'
-import { Container, Header, Content, Spinner, Item, Toast, Card, CardItem, Left, Body, Title, InputGroup, Input, Right, Button, Icon as NativeIcon } from 'native-base'
-import { View, Text, StatusBar, StyleSheet, Image, Platform, ActivityIndicator } from 'react-native'
-import {lionel, league, league2} from '../processes/image'
+import { Container, Content,Toast, Card, CardItem, Body, Icon as NativeIcon } from 'native-base'
+import { View, Text, StyleSheet, Image as RNImage, BackHandler } from 'react-native'
+import {lionel} from '../processes/image'
 import { TouchableWithoutFeedback } from 'react-native-gesture-handler';
 import isJson from '../processes/isJson'; 
 import deviceSize from '../processes/deviceSize'
 import Rolling from './Rolling'
-import { getArticles } from '../actions/request'
-import {like, archived} from '../actions/learn'
+import { MemoizedSubjectHeader } from './SubjectHeader'
+import Image from './Image'
+import {onFailedLike, loadingArticleStop, onFailedArchive} from '../actions/learn'
+import { likeFxn, unlikeFxn, archiveFxn } from '../actions/request'
+import useCheckpoint from './useCheckpoint'
 import { useDispatch, useSelector } from 'react-redux';
 
 const Overlay = lazy(() => import('./Overlay'))
@@ -18,33 +19,37 @@ const ErrorPage = lazy(() => import('./ErrorPage'))
 // const deviceHeight = deviceSize().deviceHeight
 // const deviceWidth = deviceSize().deviceWidth
 
+
 const Subject = ({ navigation, route }) => {
     const deviceHeight = deviceSize().deviceHeight
     const deviceWidth = deviceSize().deviceWidth
     const {subject} = route.params
     const dispatch = useDispatch()
     const store = isJson(useSelector(state => state.learn))
+    const preview = useMemo(() => { uri: store.preview }, [store.preview])
     const disItems = isJson(store.displayItems)
-    const [changeHeader, setChangeHeader] = useState(true)
-    const [search, setSearch] = useState('')
-    const [loading, setLoading] = useState(false)
-
-    useFocusEffect(
-        React.useCallback(() => {
-            // console.log('from subject with '+ subject)
-            dispatch(getArticles(subject))
-            return () => {
-            }
-        }, [subject])       
-    )
-    const takeTo = (i) => {
-        navigation.navigate('ReadPost', {subject: subject, index: i})
+    const takeTo = ({item}) => {
+        navigation.navigate('ReadPost', {subject: subject, item})
     }
-    const likes = (id) => {
-        dispatch(like(id))
-    }
-    const searchHeader = () => {
-        setChangeHeader(!changeHeader)
+    const likes = async (id, liked) => {
+        if(!liked){
+            const getResult = useCheckpoint(onFailureLike, onSuccessLike, id)
+            getResult().then(res => {
+                Toast.show(
+                    { 
+                        text: 'You liked post', 
+                        buttonText: 'CLOSE', 
+                        type: 'success',
+                        textStyle: { fontSize: 14 },
+                        style: {marginHorizontal: 50, borderRadius: 20, marginBottom: 20 }
+                    }
+                )
+            })
+            
+        }else{
+            const getResult = useCheckpoint(onFailureUnlike, onSuccessUnlike, id)
+            await getResult()
+        } 
     }
     const updateSearch = (search) => {
         setSearch(search)
@@ -52,62 +57,55 @@ const Subject = ({ navigation, route }) => {
             setLoading(true)
         }
     }
-    const archive = (item) => {
-        if(!item.archive) {
-            dispatch(archived({item: item, subject: subject}))
+    const archive = (obj) => {
+        if(!obj.item.archived) {
+            const getResult = useCheckpoint(onFailureArchive, onSuccessArchive, obj)
+            getResult()
         }
     }
+    const onSuccessLike = (id) => {
+        dispatch(likeFxn(id))
+    }
+    const onFailureLike = (id) => {
+        dispatch(onFailedLike({id,state: 1}))
+    }
+    const onSuccessUnlike = (id) => {
+        dispatch(unlikeFxn(id))
+    }
+    const onFailureUnlike = (id) => {
+        dispatch(onFailedLike({id,state: 0}))
+    }
+
+    // when network is confirmed for an archive request
+    const onSuccessArchive = (obj) => {
+        dispatch(archiveFxn(obj))
+    }
+    // when there is no network for a archive request
+    const onFailureArchive = (obj) => {
+        dispatch(onFailedArchive({...obj,state: 1}))
+    }
     const searchContent = () => {} 
+
+    useEffect(() => {
+        const backAction = () => {
+            if(store.loading_article){
+                dispatch(loadingArticleStop())
+                return true
+            }else{
+                return false
+            }
+        }
+
+        BackHandler.addEventListener('hardwareBackPress', backAction)
+        return () => {
+            BackHandler.removeEventListener('hardwareBackPress', backAction)
+        }
+    }, [])
+
     return(
         <Container style={{backgroundColor: "#fff"}}>
             <FocusAwareStatusBar barStyle='light-content' backgroundColor='#054078' />
-            <Header searchBar={changeHeader? false : true} style={style.header}>
-                {changeHeader ? 
-                <>
-                    <Left>
-                        <Button transparent onPress={() => navigation.navigate('Learn')}>
-                            <NativeIcon  name={Platform.OS == 'ios' ? 'chevron-back-outline' : 'arrow-back'} />
-                        </Button>
-                    </Left>
-                    <Body>
-                        <Title>
-                            {subject}
-                        </Title>
-                    </Body>
-                    <Right>
-                        <NativeIcon onPress={searchHeader} name={Platform.OS == 'ios' ? 'ios-search' : 'search'} style={{color: '#fff', fontSize: 22}} />
-                    </Right>
-                </>
-                :
-                <>
-                    {Platform.OS == 'ios' ? 
-                    <>
-                        <Item>
-                            <Icon name="ios-search" onPress={searchContent} />
-                            <Input placeholder="Search" />
-                            <Icon name="close" />
-                        </Item>
-                        <Button transparent onPress={searchHeader}>
-                            <Text>Cancel</Text>
-                        </Button>
-                    </>
-                    : 
-                    <>
-                        <Item>
-                            <NativeIcon name="ios-search" onPress={searchContent} />
-                                <Input 
-                                    placeholder="Search" 
-                                    value = {search}
-                                    onChangeText = {text => {updateSearch(text)}}
-                                />
-                            {search.length ? <ActivityIndicator size="small" color="#0000ff" /> : <Text></Text>}
-                            <NativeIcon name="arrow-forward" onPress={searchHeader} />                      
-                        </Item>
-                    </>
-                    }
-                </>
-                }
-            </Header>
+            <MemoizedSubjectHeader navigation={navigation} subject={subject} />
             <Content>
                 {store.load_error ?
                     (
@@ -129,45 +127,47 @@ const Subject = ({ navigation, route }) => {
                     (
                         <>
                             <View>
-                                <Image source={lionel()} style={style.lionel} />
+                                <RNImage source={lionel()} style={style.lionel} />
                             </View>
-                            {disItems.map((item, i) => (
+                            {disItems.map((item, i) => {
+                                let uri = item.image_url           
+                            return (
                                 <Card style={style.content} key={item.id}>
                                     <CardItem>
                                         <Body>
+                                            <View style={style.titleContainer}>
+                                                <Text numberOfLines={1} style={style.title}>
+                                                    {item.title}
+                                                </Text> 
+                                            </View>
                                             <View style={style.imgContainer}>
                                                 {item.image !== null ? (
                                                 <View style={style.viewImg}> 
-                                                    <TouchableWithoutFeedback onPress={() => takeTo(item.id)}>
-                                                        <Image source={item.img} style={style.league} />
+                                                    <TouchableWithoutFeedback onPress={() => takeTo({item})}>
+                                                        <Image style={style.league} {...{preview, uri}} />
                                                     </TouchableWithoutFeedback>
                                                 </View>
                                                 ) : null}
                                                 <View style={{...style.imgText, width: item.image !== null ? '60%': '100%'}}>
-                                                    {item.image === null ? (
-                                                        <Text numberOfLines={1} style={style.title}>
-                                                            {item.title}
-                                                        </Text> 
-                                                    ) : null}
-                                                    <TouchableWithoutFeedback onPress={() => takeTo(item.id)}>
+                                                    <TouchableWithoutFeedback onPress={() => takeTo({item})}>
                                                         <Text numberOfLines={6}>
                                                             {item.body}
                                                         </Text>                        
                                                     </TouchableWithoutFeedback>
-                                                    <View style={item.image !== null ? style.action : {...style.action, flexDirection: 'row-reverse'}}>
-                                                        <View style={{width: item.image !== null ? '100%' : '60%', flexDirection: 'row'}}>
+                                                    <View style={item.image_url !== null ? style.action : {...style.action, flexDirection: 'row-reverse'}}>
+                                                        <View style={{width: item.image_url !== null ? '100%' : '60%', flexDirection: 'row'}}>
                                                             <View style={style.actions}>
-                                                                <NativeIcon type={item.liked ? 'Ionicons' : 'FontAwesome5'} onPress={() => likes(item.id)} name='heart' style={{color: item.liked ? 'red' : '#777', fontSize: 20}} />
+                                                                <NativeIcon type={item.liked ? 'Ionicons' : 'FontAwesome5'} onPress={() => likes(item.id, item.liked)} name='heart' style={{color: item.liked ? 'red' : '#777', fontSize: 25}} />
                                                             </View>
                                                             <View style={style.actions}>
-                                                                <NativeIcon type={item.read ? 'Ionicons' : 'FontAwesome5'} name='eye' style={{color: '#777', fontSize: 20}} />
+                                                                <NativeIcon type={item.read ? 'Ionicons' : 'FontAwesome5'} name='eye' style={{color: '#777', fontSize: 25}} />
                                                             </View>
                                                             <View style={style.actions}>
                                                                 <NativeIcon 
-                                                                    onPress={() => {archive(item); Toast.show({ text: `Saved to your ${subject} archive`, buttonText: 'CLOSE', style: {backgroundColor: 'green'} })}} 
+                                                                    onPress={() => {archive({item}); Toast.show({ text: `Saved to your ${subject} archive`, buttonText: 'CLOSE', style: {backgroundColor: 'green'} })}} 
                                                                     type= 'Ionicons' 
                                                                     name= 'md-archive' 
-                                                                    style={{color: item.archived ? 'green' : '#777', fontSize: 20}} 
+                                                                    style={{color: item.archived ? 'green' : '#777', fontSize: 25}} 
                                                                 />
                                                             </View>
                                                         </View>
@@ -177,7 +177,7 @@ const Subject = ({ navigation, route }) => {
                                         </Body>
                                     </CardItem>
                                 </Card>
-                            ))}
+                            )})}
                         </>
                     )
                     :
@@ -197,13 +197,16 @@ const style = StyleSheet.create({
         flex: 1,
         backgroundColor: '#fff',
     },
-    header: {
-        marginTop: 20,
-        backgroundColor: '#054078',
+    titleContainer: {
+        marginBottom: 10,
+        alignItems: 'center',
+        justifyContent: 'center',
+        width: '100%',
     },
     title: {
-        fontSize: 20,
+        fontSize: 17,
         fontWeight: 'bold',
+        color: '#054078',
     },
     lionel: {
         width: '100%',

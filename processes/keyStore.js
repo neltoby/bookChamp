@@ -1,7 +1,6 @@
 import {Platform} from 'react-native'
 import {_retrieveData, _storeData, _deleteData} from './keys'
 import * as SecureStore from 'expo-secure-store'
-import { awaitingRequest } from '../actions/request'
 
 export const storeKey = async (key, value) => {
     try{

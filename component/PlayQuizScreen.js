@@ -4,16 +4,15 @@ import { LinearGradient } from 'expo-linear-gradient'
 import { View, Text, StyleSheet, ScrollView, StatusBar, Image,
     TouchableHighlight, BackHandler, Alert } from "react-native";
 import { Container, Content } from 'native-base'
-import QuizHeader, { MemoizedQuizHeader } from './QuizHeader'
+import { MemoizedQuizHeader } from './QuizHeader'
 import DisplayTime from './DisplayTime'
 import QuizOptions from './QuizOptions'
 import QuizQuestion from './QuizQuestion'
 import Overlay from './Overlay'
 import { MemoizedQuizReport } from './QuizReport'
 import { useSelector, useDispatch } from 'react-redux'
-import isJson from '../processes/isJson'
 import deviceSize from '../processes/deviceSize'
-import { active, playingAgain, settime } from '../actions/quiz'
+import { active, playingAgain, settime, setOverlay } from '../actions/quiz'
 import MemoizedQuizResult from './QuizResult';
 import QuizFooter from './QuizFooter';
 
@@ -36,6 +35,8 @@ const PlayQuizScreen = ({ navigation }) => {
     const toggleOverlay = () => {
         dispatch(active())
         dispatch(settime(''))
+        dispatch(setOverlay('cancel'))
+        navigation.navigate('SelectHome')
     }
     useEffect(() => {
         const backAction = () => {
@@ -104,8 +105,7 @@ const style = StyleSheet.create({
         left: 0,
         right: 0,
         top: 0,
-    },   
-       
+    },         
     quizContainer: {
         justifyContent: 'center',
         alignItems: 'center',

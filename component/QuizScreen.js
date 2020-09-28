@@ -14,7 +14,7 @@ const QuizScreen = ({ navigation }) => {
         {no: 4, text: 'Winners are selected every Sunday by 6pm'},
         {no: 5, text: 'Duration of quiz is 10 minutes'},
     ]
-    const playQuiz = () => {
+    const playQuiz = () => {       
         navigation.navigate('PlayQuiz')
     }
     useFocusEffect(
@@ -22,7 +22,7 @@ const QuizScreen = ({ navigation }) => {
           StatusBar.setBarStyle('dark-content');
           Platform.OS === 'android' && StatusBar.setBackgroundColor('#fff');
         }, [])
-      );
+    )
     return (
         <View style={style.container}>
             <View style={style.fore}>

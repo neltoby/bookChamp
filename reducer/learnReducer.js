@@ -1,13 +1,16 @@
 import produce from 'immer'
 import {displayItems} from '../processes/displayItems'
-import {LIKE, ARCHIVE, UNARCHIVE, SETARTICLE, LOADING_ARTICLE, 
-    ARTICLE_REMOVE_ERR, LOADING_ARTICLE_STOP, ARTICLE_LOADING_FAILED} from '../actions/learn'
+import {LIKE, ARCHIVE, UNARCHIVE, SETARTICLE, LOADING_ARTICLE, SET_SUBJECT,
+    ARTICLE_REMOVE_ERR, LOADING_ARTICLE_STOP, ARTICLE_LOADING_FAILED, READ_ARTICLE} from '../actions/learn'
 import isJson from '../processes/isJson'
+import { imageBase64 } from '../processes/db'
 
 const initialState = {
     displayItems: [],
     loading_article: false,
     load_error: false,
+    subject: null,
+    preview: imageBase64(),
 }
 
 export default function learnReducer (state = initialState, action) {
@@ -19,10 +22,10 @@ export default function learnReducer (state = initialState, action) {
                     item=isJson(item)
                     if(item.id == action.payload){
                         if(item.liked === true){
-                            item.likeCount = item.likeCount - 1
+                            item.likes = item.likes - 1
                             item.liked = false 
                         }else{
-                            item.likeCount = item.likeCount + 1
+                            item.likes = item.likes + 1
                             item.liked = true
                         }          
                     }
@@ -78,11 +81,29 @@ export default function learnReducer (state = initialState, action) {
                 draft.load_error = true
             })
         }
-         case ARTICLE_REMOVE_ERR: {
-             return produce(state, draft => {
-                 draft.load_error = false
-             })
-         }
+        case ARTICLE_REMOVE_ERR: {
+            return produce(state, draft => {
+                draft.load_error = false
+            })
+        }
+        case SET_SUBJECT: {
+            return produce(state, draft => {
+                draft.subject = action.payload
+            })
+        }
+        case READ_ARTICLE: {
+            return produce(state, draft => {
+                let newItem = state.displayItems.slice()
+                let newItemRes = newItem.map((item, i) => {
+                    item = isJson(item)
+                    if(item.id == action.payload){
+                        item.read = true        
+                    }
+                    return item
+                }) 
+                draft.displayItems = isJson(newItemRes)
+            })
+        }
         default: {
             return state
         }

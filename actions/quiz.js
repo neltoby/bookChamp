@@ -87,7 +87,6 @@ export const wrongAnswers = payload => {
     }
 }
 export const displayedQuestion = payload => {
-    console.log(payload, 'and this was called from the other page of the quia action')
     return {
         type: DISPLAYED,
         payload: payload

@@ -109,13 +109,7 @@ export default function quizReducer (state = initialState, action) {
         }
         case DISPLAYED: {
             return produce(state, draft => {
-                if(action.paylaod == 0){
-                    console.log(action.payload, 'payload from displayed reducer')
-                    draft.displayed.push(0)
-                }else {
-                    console.log(action.payload, 'payload from displayed reducer with a numb4er')
-                    draft.displayed.push(action.payload)
-                }
+                draft.displayed.push(action.payload)
             })
         }
         case NEXT: {

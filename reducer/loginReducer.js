@@ -1,9 +1,11 @@
 import produce from 'immer'
-import {LOGGEDIN, NOTLOGGEDIN, LOGIN_STATUS} from '../actions/login'
+import {LOGGEDIN, NOTLOGGEDIN, LOGIN_STATUS, VERIFICATION, V_NUMBER} from '../actions/login'
 
 const initialState = {
     login: '',
     status: 'inactive',
+    verification: false,
+    v_number : null,
 }
 
 export default function loginReducer(state = initialState, action) {
@@ -22,6 +24,16 @@ export default function loginReducer(state = initialState, action) {
             return produce(state, draft => {
 			    draft.status =  action.payload  		    
 			})
+        }
+        case VERIFICATION: {
+            return produce(state, draft => {
+			    draft.verification =  action.payload  		    
+			})
+        }
+        case V_NUMBER: {
+            return produce(state, draft => {
+                draft.v_number = action.payload
+            })
         }
         default:{
             return state;

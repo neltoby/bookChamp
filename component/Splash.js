@@ -3,9 +3,9 @@ import logo from '../processes/image'
 import {Animated, View, Text, StyleSheet, Dimensions, Image, StatusBar} from 'react-native'
 import { LinearGradient } from 'expo-linear-gradient'
 import {getKey} from '../processes/keyStore'
-import {loginValue} from '../processes/lock'
+import { loginValue, confirm } from '../processes/lock'
 import { useDispatch } from 'react-redux'
-import {login, notLogin} from '../actions/login'
+import { login, verification } from '../actions/login'
 
 const HEIGHT = Dimensions.get('screen').height
 const WIDTH = Dimensions.get('screen').width
@@ -22,9 +22,14 @@ const Splash = ({ navigation }) => {
     useEffect(() => {
         (async () => {
             const val = await getKey(loginValue)
+            const value = await getKey(confirm)
             console.log(val)
             if(val !== undefined && val !== null){
                 dispatch(login())
+            }else{
+                if(value !== undefined && value !== null){
+                    dispatch(verification(true))
+                }                
             }
         })()
     })

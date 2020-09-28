@@ -6,7 +6,7 @@ import logo from '../processes/image'
 import Overlay from './Overlay';
 import { useFocusEffect } from '@react-navigation/native';
 // import { realDeviceHeight } from '../processes/deviceSize'
-import { Container, Content, Form, Button, Toast, Spinner } from 'native-base';
+import { Container, Content, Form, Button, Toast, Spinner } from 'native-base'
 import { Input, Icon } from 'react-native-elements';
 import {loginRequest} from '../actions/request'
 import Rolling from './Rolling'
@@ -35,8 +35,6 @@ const Login = ({navigation}) => {
         try{
             if(username.trim().length && password.length){
                 const {isConnected, isInternetReachable} = await Network.getNetworkStateAsync();
-                console.log(isConnected)
-                console.log(isInternetReachable)
                 const airplane = await Network.isAirplaneModeEnabledAsync();
                 if(airplane){
                     Toast.show(
