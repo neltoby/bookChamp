@@ -25,7 +25,7 @@
     "expo-network": "~2.1.0",
     "expo-secure-store": "~8.1.0",
     "expo-sqlite": "~8.1.0",
-    "immer": "^6.0.5",
+    "immer": "^8.0.1",
     "native-base": "^2.13.12",
     "prop-types": "^15.7.2",
     "react": "~16.9.0",
